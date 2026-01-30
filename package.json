@@ -1,0 +1,44 @@
+{
+	"name": "@kokiito0926/zxargs",
+	"version": "0.0.0",
+	"private": false,
+	"description": "ゼックスアーグス（zxargs）を用いると、標準入力から受け取ったデータから、別のコマンドを実行することができます。",
+	"keywords": [
+		"cli",
+		"bash",
+		"shell",
+		"xargs",
+		"script",
+		"nodejs",
+		"zxargs"
+	],
+	"homepage": "https://github.com/kokiito0926/zxargs#readme",
+	"publishConfig": {
+		"access": "public"
+	},
+	"bin": {
+		"zxargs": "index.js"
+	},
+	"bugs": {
+		"url": "https://github.com/kokiito0926/zxargs/issues"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/kokiito0926/zxargs.git"
+	},
+	"license": "MIT",
+	"author": "Koki Ito <kokiito0926@gmail.com>",
+	"type": "module",
+	"scripts": {
+		"test": "node --test"
+	},
+	"dependencies": {
+		"zx": "^8.8.4"
+	},
+	"engines": {
+		"node": ">=24.0.0"
+	},
+	"devDependencies": {
+		"tree-node-cli": "^1.6.0"
+	}
+}
