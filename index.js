@@ -5,6 +5,10 @@
 // >> $ echo "1,2,3" | ./index.js --delimiter "," -- echo
 // >> $ echo "apple,banana,cherry" | ./index.js --delimiter "," --replace "{}" -- echo "Fruit: {}"
 
+// 並列でコマンドを実行できるようにしたほうがいい。
+// あとで--parallelのようなコマンドライン引数を実装する。
+// >> 2026/01/30 15:32.
+
 // $.stdioにinheritを代入すれば、下記のspawnと同じ挙動になる。
 /*
 const child = spawn(cmd, args, { stdio: "inherit" });
