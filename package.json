@@ -1,6 +1,6 @@
 {
 	"name": "@kokiito0926/zxargs",
-	"version": "0.0.2",
+	"version": "0.0.3",
 	"private": false,
 	"description": "標準入力から受け取ったデータから、別のコマンドを実行することができるコマンドラインのツールです。",
 	"keywords": [
