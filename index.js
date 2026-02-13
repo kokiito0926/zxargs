@@ -15,13 +15,14 @@ const child = spawn(cmd, args, { stdio: "inherit" });
 */
 // >> 2025/10/09 14:14.
 
-import { $, argv, stdin } from "zx";
+import { $, argv, stdin, os } from "zx";
 // import { spawn } from "node:child_process";
 
 $.stdio = "inherit";
 
 const delimiter = argv.delimiter || "\n";
 const replace = argv.replace || null;
+const parallel = argv.parallel || false;
 
 // -- 以降のコマンドと引数を手動で抽出する
 const dashDashIndex = process.argv.indexOf("--");
@@ -48,21 +49,43 @@ if (!tokens.length) {
 	process.exit(0);
 }
 
-let lastExit = 0;
-
-for (const tok of tokens) {
+// 実行する関数
+async function runCommand(tok) {
 	const args2 = replace
 		? cmdTemplateArgs.map((a) => a.replaceAll(replace, tok))
 		: [...cmdTemplateArgs, tok];
-	// console.log(args2);
 
 	try {
 		const result = await $`${cmd} ${args2}`;
-		lastExit = result.exitCode ?? 0;
+		return result.exitCode ?? 0;
 	} catch (err) {
 		console.error(err.stderr ?? err.message);
-		lastExit = err.exitCode ?? 1;
+		return err.exitCode ?? 1;
 	}
 }
 
-process.exit(lastExit);
+let exitCodes = [];
+
+if (parallel) {
+	// 並列実行
+	const concurrency = os.cpus().length;
+	const queue = [...tokens];
+	const workers = Array.from({ length: Math.min(concurrency, queue.length) }, async () => {
+		while (queue.length > 0) {
+			const tok = queue.shift();
+			const code = await runCommand(tok);
+			exitCodes.push(code);
+		}
+	});
+	await Promise.all(workers);
+} else {
+	// 逐次実行
+	for (const tok of tokens) {
+		const code = await runCommand(tok);
+		exitCodes.push(code);
+	}
+}
+
+// いずれかのコマンドが失敗した場合は、終了コード 1 を返す
+const failed = exitCodes.some((code) => code !== 0);
+process.exit(failed ? 1 : 0);
