@@ -15,25 +15,25 @@ const child = spawn(cmd, args, { stdio: "inherit" });
 */
 // >> 2025/10/09 14:14.
 
-import { $, minimist, stdin } from "zx";
+import { $, argv, stdin } from "zx";
 // import { spawn } from "node:child_process";
 
 $.stdio = "inherit";
 
-const args = minimist(process.argv.slice(2), {
-	string: ["delimiter", "replace"],
-	default: { delimiter: "\n", replace: null },
-	"--": true,
-});
-// console.log(args);
+const delimiter = argv.delimiter || "\n";
+const replace = argv.replace || null;
 
-if (args?.["--"]?.length === 0) {
+// -- 以降のコマンドと引数を手動で抽出する
+const dashDashIndex = process.argv.indexOf("--");
+const hasCommand = dashDashIndex !== -1 && dashDashIndex < process.argv.length - 1;
+
+if (!hasCommand) {
 	console.error("No command specified after --");
 	process.exit(1);
 }
 
-const cmd = args?.["--"]?.[0];
-const cmdTemplateArgs = args?.["--"]?.slice(1);
+const cmd = process.argv[dashDashIndex + 1];
+const cmdTemplateArgs = process.argv.slice(dashDashIndex + 2);
 
 let input = "";
 if (!process.stdin.isTTY) {
@@ -42,7 +42,7 @@ if (!process.stdin.isTTY) {
 // console.log(input);
 // process.exit(0);
 
-const tokens = input.split(args.delimiter).filter(Boolean);
+const tokens = input.split(delimiter).filter(Boolean);
 
 if (!tokens.length) {
 	process.exit(0);
@@ -51,8 +51,8 @@ if (!tokens.length) {
 let lastExit = 0;
 
 for (const tok of tokens) {
-	const args2 = args.replace
-		? cmdTemplateArgs.map((a) => a.replaceAll(args.replace, tok))
+	const args2 = replace
+		? cmdTemplateArgs.map((a) => a.replaceAll(replace, tok))
 		: [...cmdTemplateArgs, tok];
 	// console.log(args2);
 
